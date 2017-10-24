@@ -61,25 +61,38 @@ export const getDayCountOfMonth = function(year, month) {
   return 31;
 };
 
+export const getDayCountOfYear = function(year) {
+  const isLeapYear = year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0);
+  return isLeapYear ? 366 : 365;
+};
+
 export const getFirstDayOfMonth = function(date) {
   const temp = new Date(date.getTime());
   temp.setDate(1);
   return temp.getDay();
 };
 
-export const DAY_DURATION = 86400000;
+// see: https://stackoverflow.com/questions/3674539/incrementing-a-date-in-javascript
+// {prev, next} Date should work for Daylight Saving Time
+// Adding 24 * 60 * 60 * 1000 does not work in the above scenario
+export const prevDate = function(date, amount = 1) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() - amount);
+};
+
+export const nextDate = function(date, amount = 1) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + amount);
+};
 
 export const getStartDateOfMonth = function(year, month) {
   const result = new Date(year, month, 1);
   const day = result.getDay();
 
   if (day === 0) {
-    result.setTime(result.getTime() - DAY_DURATION * 7);
+    return prevDate(result, 7);    
   } else {
-    result.setTime(result.getTime() - DAY_DURATION * day);
+    return prevDate(result, day);
   }
 
-  return result;
 };
 
 export const getWeekNumber = function(src) {
